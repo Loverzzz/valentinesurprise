@@ -20,44 +20,66 @@
 
     <script>
         function moveButton() {
+        function moveButton() {
             const btnNo = document.getElementById('noBtn');
-            const btnYes = document.querySelector('.btn-yes'); // Select the Yes button
+            const btnYes = document.querySelector('.btn-yes');
             
-            // Get Yes button rect to avoid it
+            // Get Yes button center and dimensions
             const yesRect = btnYes.getBoundingClientRect();
-            
-            // Limit attempts to prevent infinite loops (though rare with full screen)
-            let newX, newY;
-            let overlap = true;
-            let attempts = 0;
+            const yesCX = yesRect.left + (yesRect.width / 2);
+            const yesCY = yesRect.top + (yesRect.height / 2);
             
             const maxX = window.innerWidth - btnNo.clientWidth - 20;
             const maxY = window.innerHeight - btnNo.clientHeight - 20;
 
-            // Define a buffer zone around the Yes button (e.g., 100px)
-            const buffer = 100; 
+            let newX, newY;
+            let moves = 0;
+            let safe = false;
+            
+            // Minimum distance from Yes button (center to center)
+            const minDistance = 150; // Pixels
 
-            while (overlap && attempts < 50) {
+            while (!safe && moves < 50) {
                 newX = Math.floor(Math.random() * maxX);
                 newY = Math.floor(Math.random() * maxY);
                 
-                // Ensure safe bounds
+                // Ensure bounds
                 newX = Math.max(20, newX);
                 newY = Math.max(20, newY);
 
-                // Check collision with Yes button (+ buffer)
-                // Simple AABB collision check expanded by buffer
-                if (
-                    newX < yesRect.right + buffer &&
-                    newX + btnNo.clientWidth > yesRect.left - buffer &&
-                    newY < yesRect.bottom + buffer &&
-                    newY + btnNo.clientHeight > yesRect.top - buffer
-                ) {
-                    overlap = true; // Too close, try again
-                } else {
-                    overlap = false; // Safe spot found
+                // Calculate distance to Yes button
+                const btnCX = newX + (btnNo.clientWidth / 2);
+                const btnCY = newY + (btnNo.clientHeight / 2);
+                
+                const dist = Math.sqrt(Math.pow(btnCX - yesCX, 2) + Math.pow(btnCY - yesCY, 2));
+
+                if (dist > minDistance) {
+                    safe = true;
                 }
-                attempts++;
+                moves++;
+            }
+
+            // Fallback if no safe spot found (rare): Send to corners
+            if (!safe) {
+                const corners = [
+                    {x: 20, y: 20}, // Top Left
+                    {x: maxX, y: 20}, // Top Right
+                    {x: 20, y: maxY}, // Bottom Left
+                    {x: maxX, y: maxY} // Bottom Right
+                ];
+                // Pick corner furthest from Yes button
+                let bestCorner = corners[0];
+                let maxDist = 0;
+                
+                corners.forEach(corner => {
+                    const dist = Math.sqrt(Math.pow(corner.x - yesCX, 2) + Math.pow(corner.y - yesCY, 2));
+                    if (dist > maxDist) {
+                        maxDist = dist;
+                        bestCorner = corner;
+                    }
+                });
+                newX = bestCorner.x;
+                newY = bestCorner.y;
             }
 
             btnNo.style.position = 'fixed'; 
