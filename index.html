@@ -91,33 +91,7 @@
             btnNo.style.top = newY + 'px';
         }
 
-            // Fallback if no safe spot found (rare): Send to corners
-            if (!safe) {
-                const corners = [
-                    {x: 20, y: 20}, // Top Left
-                    {x: maxX, y: 20}, // Top Right
-                    {x: 20, y: maxY}, // Bottom Left
-                    {x: maxX, y: maxY} // Bottom Right
-                ];
-                // Pick corner furthest from Yes button
-                let bestCorner = corners[0];
-                let maxDist = 0;
-                
-                corners.forEach(corner => {
-                    const dist = Math.sqrt(Math.pow(corner.x - yesCX, 2) + Math.pow(corner.y - yesCY, 2));
-                    if (dist > maxDist) {
-                        maxDist = dist;
-                        bestCorner = corner;
-                    }
-                });
-                newX = bestCorner.x;
-                newY = bestCorner.y;
-            }
 
-            btnNo.style.position = 'fixed'; 
-            btnNo.style.left = newX + 'px';
-            btnNo.style.top = newY + 'px';
-        }
 
         function goToWish() {
             window.location.href = "wish.html";
