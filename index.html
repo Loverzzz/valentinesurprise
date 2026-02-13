@@ -19,26 +19,42 @@
     </div>
 
     <script>
+        let noClickCount = 0;
+
         function moveButton() {
             const btnNo = document.getElementById('noBtn');
             const btnYes = document.querySelector('.btn-yes');
             
-            // Get Yes button center and dimensions
+            // Increment click/hover count
+            noClickCount++;
+            
+            // Limit to 5 attempts, then disappear
+            if (noClickCount >= 5) {
+                btnNo.style.display = 'none';
+                alert("Okay okay, you win! Just say YES already! 😜");
+                return;
+            }
+
+            // Get Yes button rect
             const yesRect = btnYes.getBoundingClientRect();
-            const yesCX = yesRect.left + (yesRect.width / 2);
-            const yesCY = yesRect.top + (yesRect.height / 2);
             
             const maxX = window.innerWidth - btnNo.clientWidth - 20;
             const maxY = window.innerHeight - btnNo.clientHeight - 20;
 
             let newX, newY;
-            let moves = 0;
             let safe = false;
-            
-            // Minimum distance from Yes button (center to center)
-            const minDistance = 150; // Pixels
+            let attempts = 0;
 
-            while (!safe && moves < 50) {
+            // Strict forbidden zone (Yes button + 50px padding on all sides)
+            // We use this because distance check can sometimes be lenient on corners
+            const forbidden = {
+                left: yesRect.left - 60,
+                right: yesRect.right + 60,
+                top: yesRect.top - 60,
+                bottom: yesRect.bottom + 60
+            };
+
+            while (!safe && attempts < 50) {
                 newX = Math.floor(Math.random() * maxX);
                 newY = Math.floor(Math.random() * maxY);
                 
@@ -46,17 +62,34 @@
                 newX = Math.max(20, newX);
                 newY = Math.max(20, newY);
 
-                // Calculate distance to Yes button
-                const btnCX = newX + (btnNo.clientWidth / 2);
-                const btnCY = newY + (btnNo.clientHeight / 2);
-                
-                const dist = Math.sqrt(Math.pow(btnCX - yesCX, 2) + Math.pow(btnCY - yesCY, 2));
+                // Check if new position overlaps with forbidden zone
+                // The new button occupies: [newX, newX + width] x [newY, newY + height]
+                const btnRight = newX + btnNo.clientWidth;
+                const btnBottom = newY + btnNo.clientHeight;
 
-                if (dist > minDistance) {
+                // Collision detection:
+                // If the button is strictly to the left, right, top, or bottom of the forbidden zone, it is safe.
+                if (
+                    btnRight < forbidden.left || // Completely to the left
+                    newX > forbidden.right ||    // Completely to the right
+                    btnBottom < forbidden.top || // Completely above
+                    newY > forbidden.bottom      // Completely below
+                ) {
                     safe = true;
                 }
-                moves++;
+                attempts++;
             }
+
+            // Fallback: Force to top-left corner if valid, or bottom-right
+            if (!safe) {
+                newX = 20;
+                newY = 20;
+            }
+
+            btnNo.style.position = 'fixed'; 
+            btnNo.style.left = newX + 'px';
+            btnNo.style.top = newY + 'px';
+        }
 
             // Fallback if no safe spot found (rare): Send to corners
             if (!safe) {
