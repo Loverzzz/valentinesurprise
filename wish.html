@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Wish! ✨</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Yay! I knew it Bita! 💖</h1>
+        <p style="color: #444;">Now, tell me your wishes for us...</p>
+
+        <form id="wishForm" onsubmit="submitForm(event)">
+            <label for="wishes">Design Your Future With Me:</label>
+            <textarea id="wishes" placeholder="Write your hopes, dreams, and prayers for our relationship here..." required></textarea>
+
+            <label for="gift">Choose a Gift (Max Rp 250.000):</label>
+            <input type="number" id="gift" placeholder="Enter amount (e.g., 150000)" required>
+            <div id="error-msg" class="error-msg">⚠️ Budget limit is Rp 250.000, sayang Bita! Hemat pangkal kaya! 😜</div>
+
+            <button type="submit" class="btn btn-yes" style="margin-top: 20px; width: 100%;">SEND MY WISH 💌</button>
+        </form>
+    </div>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const giftAmount = document.getElementById('gift').value;
+            const errorMsg = document.getElementById('error-msg');
+            const maxAmount = 250000;
+
+            if (giftAmount > maxAmount) {
+                errorMsg.style.display = 'block';
+                // Shake animation or focus highlighting could go here
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+
+            const wishes = document.getElementById('wishes').value;
+            
+            // Format message for WhatsApp
+            // Open user's WhatsApp to send TO Aldo (081915967694)
+            // Message: "Hi sayang Aldo! Aku (Bita) punya wish nih..."
+            const message = `Hi sayang Aldo! Aku Bita punya wish nih: ${wishes}. Hadiahnya: Rp ${giftAmount}. Love you! ❤️`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/6281915967694?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.location.href = whatsappUrl;
+            
+            // Optional: visual feedback before redirect (though redirect is fast)
+            alert(`Opening WhatsApp to send your wish to Aldo! 💖`);
+            
+            // Optional: Redirect to a "Thank you" state or reset
+            document.querySelector('.container').innerHTML = `
+                <h1>Message Received! 💘</h1>
+                <p>I'll do my best to make it happen!</p>
+                <div class="heart-beat" style="font-size: 100px;">💑</div>
+                <button class="btn btn-yes" onclick="window.location.href='index.html'">Play Again</button>
+            `;
+        }
+    </script>
+</body>
+</html>

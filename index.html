@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do You Love Me?</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="heart-beat">❤️</div>
+        <h1>Bita, do you love me?</h1>
+        <p style="font-size: 1.2rem; color: #333;">Be honest... 😉</p>
+        
+        <div class="buttons" style="height: 100px;"> <!-- Fixed height for container -->
+            <button class="btn btn-yes" onclick="goToWish()">YES! 😍</button>
+            <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()" ontouchstart="moveButton()">NO 😢</button>
+        </div>
+    </div>
+
+    <script>
+        function moveButton() {
+            const btnNo = document.getElementById('noBtn');
+            const btnYes = document.querySelector('.btn-yes'); // Select the Yes button
+            
+            // Get Yes button rect to avoid it
+            const yesRect = btnYes.getBoundingClientRect();
+            
+            // Limit attempts to prevent infinite loops (though rare with full screen)
+            let newX, newY;
+            let overlap = true;
+            let attempts = 0;
+            
+            const maxX = window.innerWidth - btnNo.clientWidth - 20;
+            const maxY = window.innerHeight - btnNo.clientHeight - 20;
+
+            // Define a buffer zone around the Yes button (e.g., 100px)
+            const buffer = 100; 
+
+            while (overlap && attempts < 50) {
+                newX = Math.floor(Math.random() * maxX);
+                newY = Math.floor(Math.random() * maxY);
+                
+                // Ensure safe bounds
+                newX = Math.max(20, newX);
+                newY = Math.max(20, newY);
+
+                // Check collision with Yes button (+ buffer)
+                // Simple AABB collision check expanded by buffer
+                if (
+                    newX < yesRect.right + buffer &&
+                    newX + btnNo.clientWidth > yesRect.left - buffer &&
+                    newY < yesRect.bottom + buffer &&
+                    newY + btnNo.clientHeight > yesRect.top - buffer
+                ) {
+                    overlap = true; // Too close, try again
+                } else {
+                    overlap = false; // Safe spot found
+                }
+                attempts++;
+            }
+
+            btnNo.style.position = 'fixed'; 
+            btnNo.style.left = newX + 'px';
+            btnNo.style.top = newY + 'px';
+        }
+
+        function goToWish() {
+            window.location.href = "wish.html";
+        }
+    </script>
+</body>
+</html>
