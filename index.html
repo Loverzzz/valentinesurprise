@@ -14,14 +14,19 @@
         
         <div class="buttons" style="height: 100px;"> <!-- Fixed height for container -->
             <button class="btn btn-yes" onclick="goToWish()">YES! 😍</button>
-            <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()" ontouchstart="moveButton()">NO 😢</button>
+            <button class="btn btn-no" id="noBtn" onmouseover="moveButton(event)" onclick="moveButton(event)" ontouchstart="moveButton(event)">NO 😢</button>
         </div>
     </div>
 
     <script>
         let noClickCount = 0;
 
-        function moveButton() {
+        function moveButton(e) {
+            // Prevent phantom clicks on mobile (prevents 'click' from firing after 'touchstart')
+            if (e && e.type === 'touchstart') {
+                e.preventDefault();
+            }
+
             const btnNo = document.getElementById('noBtn');
             const btnYes = document.querySelector('.btn-yes');
             
